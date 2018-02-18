@@ -7,7 +7,7 @@ namespace PixelBin.Models
 {
     public class User
     {
-        public Guid userId { get; set; }
+        public Guid UserId { get; set; }
         //public string email { get; set; }
         public string Name { get; set; }
         public string UserSummary { get; set; }
@@ -17,15 +17,27 @@ namespace PixelBin.Models
         public List<User>  SubscribedToList { get; set; }
 
         //string email, 
-        public User(string name, string surname)
+        public User(Guid userId,string name, string surname)
         {
-            userId=new Guid();
+            this.UserId = userId;
             //this.email = email;
             this.Name = name;
             this.Surname = surname;
             FavoriteImages=new List<Image>();
             SubscribedToList=new List<User>();
             FavoriteAlbums=new List<Album>();
+
+        }
+
+        public User(Guid userId)
+        {
+            this.UserId = userId;
+            //this.email = email;
+            this.Name = "N/A";
+            this.Surname = "N/A";
+            FavoriteImages = new List<Image>();
+            SubscribedToList = new List<User>();
+            FavoriteAlbums = new List<Album>();
 
         }
 
@@ -44,14 +56,14 @@ namespace PixelBin.Models
                 return false;
             }
 
-            return this.userId.Equals(item.userId);
+            return this.UserId.Equals(item.UserId);
         }
 
 
         //overridana gethashcode metoda
         public override int GetHashCode()
         {
-            return this.userId.GetHashCode();
+            return this.UserId.GetHashCode();
         }
 
     }

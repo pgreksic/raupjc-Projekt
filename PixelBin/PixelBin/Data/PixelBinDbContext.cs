@@ -15,7 +15,7 @@ namespace PixelBin.Data
         public IDbSet<Album> Albums { get; set; }
         public IDbSet<Image> Images { get; set; }
         public  IDbSet<Comment> Comments { get; set; }
-        public IDbSet<Like> Likes { get; set; }
+        //public IDbSet<Like> Likes { get; set; }
 
 
         public PixelBinDbContext(string connectionString) : base(connectionString)
@@ -25,7 +25,7 @@ namespace PixelBin.Data
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>().HasKey(user => user.userId);
+            modelBuilder.Entity<User>().HasKey(user => user.UserId);
             modelBuilder.Entity<User>().Property(item => item.Name).IsRequired();   
             modelBuilder.Entity<User>().Property(item => item.Surname).IsRequired();
             modelBuilder.Entity<User>().Property(item => item.UserSummary).IsRequired();
@@ -40,9 +40,14 @@ namespace PixelBin.Data
             modelBuilder.Entity<Image>().HasKey(img => img.ImageId);
             modelBuilder.Entity<Image>().Property(item => item.ImageOwnerId).IsRequired();
             modelBuilder.Entity<Image>().Property(item => item.ImageName).IsRequired();
+            modelBuilder.Entity<Image>().Property(item => item.ImagePath).IsRequired();
 
             modelBuilder.Entity<Like>().HasKey(like => like.LikeId);
             modelBuilder.Entity<Like>().Property(item => item.UserId).IsRequired();
+            //modelBuilder.Entity<Like>().Property(item => item.imageId).IsRequired();
+
+            modelBuilder.Entity<Dislike>().HasKey(like => like.DislikeId);
+            modelBuilder.Entity<Dislike>().Property(item => item.UserId).IsRequired();
             //modelBuilder.Entity<Like>().Property(item => item.imageId).IsRequired();
 
             modelBuilder.Entity<Comment>().HasKey(comment => comment.CommentId);
@@ -52,6 +57,7 @@ namespace PixelBin.Data
             //many to many || one to many
             modelBuilder.Entity<Album>().HasMany(item => item.Images);
             modelBuilder.Entity<Album>().HasMany(item => item.Likes);
+            modelBuilder.Entity<Album>().HasMany(item => item.Dislikes);
             modelBuilder.Entity<Album>().HasMany(item => item.Comments);
 
             modelBuilder.Entity<User>().HasMany(item => item.FavoriteImages);
@@ -60,6 +66,7 @@ namespace PixelBin.Data
 
             modelBuilder.Entity<Image>().HasMany(item => item.ImageComments);
             modelBuilder.Entity<Image>().HasMany(item => item.ImageLikes);
+            modelBuilder.Entity<Image>().HasMany(item => item.ImageDislikes);
 
 
         }

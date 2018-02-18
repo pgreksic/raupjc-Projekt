@@ -12,6 +12,7 @@ namespace PixelBin.Models
         public Guid ImageOwnerId { get; set; }
         public string ImageDescription { get; set; }
         public List<Like> ImageLikes { get; set; }
+        public List<Dislike> ImageDislikes { get; set; }
         public List<Comment> ImageComments { get; set; }
         public bool isFeatured { get; set; }
 
@@ -23,6 +24,7 @@ namespace PixelBin.Models
             ImageOwnerId = ownerId;
             ImageDescription = description;
             ImageLikes=new List<Like>();
+            ImageDislikes=new List<Dislike>();
             ImageComments=new List<Comment>();
             isFeatured = false;
         }

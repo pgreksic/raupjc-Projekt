@@ -26,6 +26,7 @@ namespace PixelBin
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
@@ -33,8 +34,21 @@ namespace PixelBin
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
+            
+            services.AddTransient<IPixelBinRepository, PixelBinRepository>();
+            services.AddScoped<PixelBinDbContext>(g => { return new PixelBinDbContext(Configuration["ConnectionStrings:DefaultConnection"]); });
+
+            services.AddAuthentication().AddGoogle(googleOptions =>
+            {
+                googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
+                googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
+            });
+
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
+
+            //Causes error:Cannnot open database error ???????
+            //CreateAdminRole(services.BuildServiceProvider()).Wait();
 
             services.AddMvc();
         }
@@ -63,6 +77,50 @@ namespace PixelBin
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+        }
+
+        private async Task CreateAdminRole(IServiceProvider serviceProvider)
+        {
+
+            string adminRole = "Admin";
+            string adminname = "Administrator";
+            string adminemail = "admin.user@adminmail.com";
+            string adminpassword = "PixelBinAdministrator77";
+
+            var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var UserManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            
+            IdentityResult roleResult;
+
+
+            
+            var roleExist = await RoleManager.RoleExistsAsync(adminRole);
+            //var roleExist = false;
+            if (!roleExist)
+            {
+               roleResult = await RoleManager.CreateAsync(new IdentityRole(adminRole));
+            }
+            
+
+            //creating a super user who could maintain the web app
+            var adminuser = new ApplicationUser
+            {
+                UserName = adminname,
+                Email = adminemail
+
+            };
+            string UserPassword = adminpassword;
+            var _user = await UserManager.FindByEmailAsync(adminemail);
+
+            if (_user == null)
+            {
+                var createPowerUser = await UserManager.CreateAsync(adminuser, UserPassword);
+                if (createPowerUser.Succeeded)
+                {
+                    //here we tie the new user to the "Admin" role 
+                    await UserManager.AddToRoleAsync(adminuser, "Admin");
+                }
+            }
         }
     }
 }

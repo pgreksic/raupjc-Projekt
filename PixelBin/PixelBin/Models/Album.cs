@@ -14,6 +14,7 @@ namespace PixelBin.Models
         public List<Image> Images { get; set; }
         public List<Comment> Comments { get; set; }
         public List<Like> Likes { get; set; }
+        public List<Dislike> Dislikes { get; set; }
         public bool isPinned { get; set; }
         public DateTime DateAdded { get; set; }
 
@@ -27,6 +28,7 @@ namespace PixelBin.Models
             Images=new List<Image>();
             Comments=new List<Comment>();
             Likes=new List<Like>();
+            Dislikes=new List<Dislike>();
             DateAdded=DateTime.Now;
         }
 
