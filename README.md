@@ -1,6 +1,11 @@
 # raupjc-Projekt
 C# Projekt-----Galerija slika
 
-Link:
+Azure:
 
-Admin accounts:
+Admin account
+
+Email:  admin.user@adminmail.com
+
+Password:  _AStrongP@ssword!88
+
