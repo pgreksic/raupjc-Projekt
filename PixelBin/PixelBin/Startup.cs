@@ -48,7 +48,9 @@ namespace PixelBin
             services.AddTransient<IEmailSender, EmailSender>();
 
             //Causes error:Cannnot open database error ???????
-            //CreateAdminRole(services.BuildServiceProvider()).Wait();
+            //CreateAdminRole1(services.BuildServiceProvider());
+            CreateAdminRole2(services.BuildServiceProvider());
+
 
             services.AddMvc();
         }
@@ -79,13 +81,58 @@ namespace PixelBin
             });
         }
 
-        private async Task CreateAdminRole(IServiceProvider serviceProvider)
+        //function version 2--works!!!
+        private void CreateAdminRole2(IServiceProvider serviceProvider)
+        {
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            Task<IdentityResult> roleResult;
+            string adminemail = "admin.user@adminmail.com";
+            string adminpassword = "_AStrongP@ssword!88";
+            string rolename = "Admin";
+
+            //Check that there is an Administrator role and create if not
+            Task<bool> hasAdminRole = roleManager.RoleExistsAsync(rolename);
+            hasAdminRole.Wait();
+
+            if (!hasAdminRole.Result)
+            {
+                roleResult = roleManager.CreateAsync(new IdentityRole(rolename));
+                roleResult.Wait();
+            }
+
+            //Check if the admin user exists and create it if not
+            //Add to the Administrator role
+
+            Task<ApplicationUser> testUser = userManager.FindByEmailAsync(adminemail);
+            testUser.Wait();
+
+            if (testUser.Result == null)
+            {
+                ApplicationUser administrator = new ApplicationUser();
+                administrator.Email = adminemail;
+                administrator.UserName = adminemail;
+
+                Task<IdentityResult> newUser = userManager.CreateAsync(administrator, adminpassword);
+                newUser.Wait();
+
+                if (newUser.Result.Succeeded)
+                {
+                    Task<IdentityResult> newUserRole = userManager.AddToRoleAsync(administrator, rolename);
+                    newUserRole.Wait();
+                }
+            }
+
+        }
+
+        //function version 1
+        private async Task CreateAdminRole1(IServiceProvider serviceProvider)
         {
 
             string adminRole = "Admin";
             string adminname = "Administrator";
             string adminemail = "admin.user@adminmail.com";
-            string adminpassword = "PixelBinAdministrator77";
+            string adminpassword = "PixelBinAdministrator77''";
 
             var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var UserManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
